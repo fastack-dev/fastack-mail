@@ -4,6 +4,7 @@ from aiosmtplib import SMTP
 from aiosmtplib.connection import DEFAULT_TIMEOUT
 
 from fastack_mail.message import Message
+from fastack_mail.sync import run_sync
 
 
 class EmailBackend:
@@ -68,14 +69,18 @@ class EmailBackend:
             message, Message
         ), "Message must be an instance of fastack_mail.message.Message"
         msg = message.build()
+        params = {
+            "sender": sender,
+            "recipients": recipients,
+            "mail_options": mail_options,
+            "rcpt_options": rcpt_options,
+        }
+
+        async def func():
+            async with self.client:
+                return await self.client.send_message(msg, **params)
+
+        func.__doc__ = self.client.send_message.__doc__
         if self._async_mode:
-            func = self.client.send_message
-        else:
-            func = self.client.send_message_sync
-        return func(
-            msg,
-            sender=sender,
-            recipients=recipients,
-            mail_options=mail_options,
-            rcpt_options=rcpt_options,
-        )
+            return func()
+        return run_sync(func)

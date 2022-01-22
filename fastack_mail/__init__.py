@@ -13,9 +13,8 @@ def setup(app: Fastack):
             continue
 
         value = app.get_setting(setting)
-        if value:
-            setting = setting[len(prefix) :].lower()
-            params[setting] = value
+        setting = setting[len(prefix) :].lower()
+        params[setting] = value
 
     klass = app.get_setting(email_backend_class_setting)
     try:
