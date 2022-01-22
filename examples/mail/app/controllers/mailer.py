@@ -17,7 +17,7 @@ class MessageBody(BaseModel):
 
 
 class MailerController(Controller):
-    def post(self, body: MessageBody, background_task: BackgroundTasks):
+    async def post(self, body: MessageBody, background_task: BackgroundTasks):
         data = body.dict()
         data.pop("background_task")
         data["recipients"] = [data.pop("to")]
@@ -25,5 +25,5 @@ class MailerController(Controller):
         if body.background_task:
             background_task.add_task(email.send, message)
         else:
-            email.send(message)
-        return {"message": "ok"}
+            await email.send(message)
+        return {"detail": "ok"}
