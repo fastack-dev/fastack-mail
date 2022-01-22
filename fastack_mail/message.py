@@ -8,9 +8,10 @@ from email.utils import formatdate, make_msgid
 from mimetypes import guess_type
 from typing import List, Optional, TextIO
 
-from aiosmtplib.sync import async_to_sync
 from fastack.globals import current_app
 from pydantic import EmailStr, validate_arguments
+
+from fastack_mail.sync import run_sync
 
 
 class Message:
@@ -81,7 +82,7 @@ class Message:
         main_type, sub_type = mimetype.split("/", 1)
         part = MIMEBase(main_type, sub_type)
         if iscoroutinefunction(file.read):
-            payload = async_to_sync(file.read())
+            payload = run_sync(file.read)
         else:
             payload = file.read()
         part.set_payload(payload)

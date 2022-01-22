@@ -80,7 +80,6 @@ class EmailBackend:
             async with self.client:
                 return await self.client.send_message(msg, **params)
 
-        func.__doc__ = self.client.send_message.__doc__
         if self._async_mode:
             return func()
         return run_sync(func)
